@@ -1,7 +1,8 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 from src.schemas.link import LinkCreate, LinkUpdate, Link
-from src.services.link_service import create_link, get_link, update_link, delete_link, get_link_stats
+from src.services.link_service import create_link, get_link, update_link, delete_link, get_link_stats, \
+    search_link_by_url, get_expired_links, get_links_project
 from src.services.auth_service import get_current_user
 from src.database import get_async_session
 
@@ -51,3 +52,31 @@ async def read_link_stats(short_code: str, db: AsyncSession = Depends(get_async_
     if stats is None:
         raise HTTPException(status_code=404, detail="Link not found")
     return stats
+
+@router.get("/search", response_model=Link)
+async def search_link(
+    original_url: str = Query(..., description="The original URL to search for"),
+    db: AsyncSession = Depends(get_async_session),
+    current_user: dict = Depends(get_current_user)
+):
+    link = await search_link_by_url(db, original_url, current_user)
+    if link is None:
+        raise HTTPException(status_code=404, detail="Link not found, expired, or unauthorized")
+    return link
+
+@router.get("/expired", response_model=list[Link])
+async def get_expired_links_history(
+    db: AsyncSession = Depends(get_async_session),
+    current_user: dict = Depends(get_current_user)
+):
+    links = await get_expired_links(db, current_user)
+    return links
+
+@router.get("/project/{project}", response_model=list[Link])
+async def get_links_by_project(
+    project: str,
+    db: AsyncSession = Depends(get_async_session),
+    current_user: dict = Depends(get_current_user)
+):
+    links = await get_links_project(db, project, current_user)
+    return links

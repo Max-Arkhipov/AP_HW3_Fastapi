@@ -19,13 +19,15 @@ class User(Base):
 class Link(Base):
     __tablename__ = "links"
 
-    short_code = Column(String(10), primary_key=True, index=True)
+    id = Column(Integer, primary_key=True, index=True)  # Возвращаем id
+    short_code = Column(String(10), unique=True, index=True, nullable=False)
     original_url = Column(String(2048), nullable=False)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
     expires_at = Column(DateTime(timezone=True))
     clicks = Column(Integer, default=0)
-    last_clicked = Column(DateTime(timezone=True))
+    last_used = Column(DateTime(timezone=True))
     user_id = Column(Integer, ForeignKey("users.id"))
     is_active = Column(Boolean, default=True)
+    project = Column(String(50), nullable=True)
 
     user = relationship("User", back_populates="links")

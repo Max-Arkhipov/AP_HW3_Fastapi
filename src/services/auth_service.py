@@ -1,5 +1,7 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
+
+from src.database import get_async_session
 from src.models import User
 from src.schemas.auth import UserCreate, UserLogin
 from src.utils import hash_password, verify_password
@@ -43,12 +45,21 @@ def create_access_token(data: dict, expires_delta: timedelta = None):
     encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
     return encoded_jwt
 
-def get_current_user(token: str = Depends(oauth2_scheme)):
+
+class JWTError:
+    pass
+
+
+async def get_current_user(token: str = Depends(oauth2_scheme), db: AsyncSession = Depends(get_async_session)):
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         username: str = payload.get("sub")
         if username is None:
-            raise HTTPException(status_code=401, detail="Invalid authentication credentials")
-    except jwt.PyJWTError:
-        raise HTTPException(status_code=401, detail="Invalid authentication credentials")
-    return {"username": username}
+            raise HTTPException(status_code=401, detail="Invalid token")
+        user = await db.execute(select(User).filter(User.username == username))
+        user = user.scalar_one_or_none()
+        if user is None:
+            raise HTTPException(status_code=401, detail="User not found")
+        return {"id": user.id, "username": user.username}  # Убедитесь, что id возвращается
+    except JWTError:
+        raise HTTPException(status_code=401, detail="Invalid token")

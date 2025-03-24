@@ -1,23 +1,26 @@
+from fastapi import Query
 from pydantic import BaseModel
 from datetime import datetime
+from typing import Optional
 
 class LinkBase(BaseModel):
     original_url: str
+    short_code: str | None = None
+    expires_at: Optional[datetime] = None
+    project: Optional[str] = None
 
 class LinkCreate(LinkBase):
-    custom_alias: str | None = None  # Для кастомных ссылок
-    expires_at: datetime | None = None  # Время жизни ссылки
+    pass
 
 class LinkUpdate(BaseModel):
-    original_url: str | None = None
-    expires_at: datetime | None = None
+    original_url: Optional[str] = None
+    expires_at: Optional[datetime] = None
 
 class Link(LinkBase):
-    short_code: str
-    created_at: datetime
-    expires_at: datetime | None
+    id: int
+    created_at: Optional[datetime] = None
     clicks: int
-    last_used: datetime | None
+    last_used: Optional[datetime] = None
 
     class Config:
         from_attributes = True

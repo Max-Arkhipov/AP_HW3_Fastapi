@@ -2,6 +2,7 @@ from passlib.context import CryptContext
 
 import random
 import string
+import logging
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
