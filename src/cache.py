@@ -1,9 +1,10 @@
 import redis.asyncio as redis
 import json
 from contextlib import asynccontextmanager
+from src.config import REDIS_URL
 
-REDIS_URL = "redis://localhost:6379/0"
 redis_client = None
+
 
 @asynccontextmanager
 async def get_redis():
