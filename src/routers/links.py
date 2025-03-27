@@ -1,3 +1,5 @@
+import time
+
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 from src.schemas.link import LinkCreate, LinkUpdate, Link
@@ -16,14 +18,14 @@ async def shorten_link(
 ):
     return await create_link(db, link, current_user)
 
-@router.get("/{short_code}", response_model=Link)
+@router.get("/get_link/{short_code}", response_model=Link)
 async def read_link(short_code: str, db: AsyncSession = Depends(get_async_session)):
     link = await get_link(db, short_code)
     if link is None:
         raise HTTPException(status_code=404, detail="Link not found or expired")
     return link
 
-@router.put("/{short_code}", response_model=Link)
+@router.put("/put_link/{short_code}", response_model=Link)
 async def update_link_endpoint(
     short_code: str,
     link: LinkUpdate,
@@ -35,7 +37,7 @@ async def update_link_endpoint(
         raise HTTPException(status_code=404, detail="Link not found or unauthorized")
     return updated_link
 
-@router.delete("/{short_code}")
+@router.delete("/delete_link/{short_code}")
 async def delete_link_endpoint(
     short_code: str,
     db: AsyncSession = Depends(get_async_session),
@@ -46,7 +48,7 @@ async def delete_link_endpoint(
         raise HTTPException(status_code=404, detail="Link not found or unauthorized")
     return {"message": "Link deleted"}
 
-@router.get("/{short_code}/stats")
+@router.get("/stats/{short_code}")
 async def read_link_stats(short_code: str, db: AsyncSession = Depends(get_async_session)):
     stats = await get_link_stats(db, short_code)
     if stats is None:
