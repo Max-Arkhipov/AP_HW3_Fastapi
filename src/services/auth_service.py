@@ -1,12 +1,14 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.future import select
+from typing import Optional
+from fastapi import Security
 
 from src.database import get_async_session
 from src.models import User
 from src.schemas.auth import UserCreate, UserLogin
 from src.utils import hash_password, verify_password
 from fastapi import HTTPException, Depends
-from fastapi.security import OAuth2PasswordBearer, HTTPBearer, HTTPAuthorizationCredentials
+from fastapi.security import OAuth2PasswordBearer, HTTPBearer
 import jwt
 from datetime import datetime, timedelta
 
@@ -64,11 +66,26 @@ async def get_current_user(token: str = Depends(oauth2_scheme), db: AsyncSession
     except JWTError:
         raise HTTPException(status_code=401, detail="Invalid token")
 
-security = HTTPBearer(auto_error=False)
 
 async def optional_get_current_user(
-    credentials: HTTPAuthorizationCredentials = Depends(security)
+        token: Optional[str] = Depends(OAuth2PasswordBearer(tokenUrl="/auth/login", auto_error=False)),
+        # Теперь auto_error работает
+        db: AsyncSession = Depends(get_async_session)
 ):
-    if credentials:
-        return await get_current_user(credentials)
-    return None
+    if not token:
+        return None  # Позволяет анонимным пользователям
+
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        username: str = payload.get("sub")
+        if not username:
+            return None
+
+        result = await db.execute(select(User).filter(User.username == username))
+        user = result.scalar_one_or_none()
+        if not user:
+            return None
+
+        return {"id": user.id, "username": user.username}
+    except jwt.PyJWTError:
+        return None
