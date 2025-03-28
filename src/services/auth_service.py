@@ -6,7 +6,7 @@ from src.models import User
 from src.schemas.auth import UserCreate, UserLogin
 from src.utils import hash_password, verify_password
 from fastapi import HTTPException, Depends
-from fastapi.security import OAuth2PasswordBearer
+from fastapi.security import OAuth2PasswordBearer, HTTPBearer, HTTPAuthorizationCredentials
 import jwt
 from datetime import datetime, timedelta
 
@@ -63,3 +63,12 @@ async def get_current_user(token: str = Depends(oauth2_scheme), db: AsyncSession
         return {"id": user.id, "username": user.username}  # Убедитесь, что id возвращается
     except JWTError:
         raise HTTPException(status_code=401, detail="Invalid token")
+
+security = HTTPBearer(auto_error=False)
+
+async def optional_get_current_user(
+    credentials: HTTPAuthorizationCredentials = Depends(security)
+):
+    if credentials:
+        return await get_current_user(credentials)
+    return None

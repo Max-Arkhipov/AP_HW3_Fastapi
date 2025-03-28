@@ -5,7 +5,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from src.schemas.link import LinkCreate, LinkUpdate, Link
 from src.services.link_service import create_link, get_link, update_link, delete_link, get_link_stats, \
     search_link_by_url, get_expired_links, get_links_project
-from src.services.auth_service import get_current_user
+from src.services.auth_service import get_current_user, optional_get_current_user
 from src.database import get_async_session
 
 router = APIRouter()
@@ -14,7 +14,7 @@ router = APIRouter()
 async def shorten_link(
     link: LinkCreate,
     db: AsyncSession = Depends(get_async_session),
-    current_user: dict = Depends(get_current_user)
+    current_user: dict | None = Depends(optional_get_current_user)
 ):
     return await create_link(db, link, current_user)
 

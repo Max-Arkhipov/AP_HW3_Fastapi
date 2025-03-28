@@ -74,7 +74,7 @@ async def get_link(db: AsyncSession, short_code: str):
 async def update_link(db: AsyncSession, short_code: str, link_data: LinkUpdate, current_user: dict):
     result = await db.execute(select(Link).filter(Link.short_code == short_code))
     link = result.scalar_one_or_none()
-    if not link or (link.user_id != current_user.get("id")):
+    if not link or (link.user_id and link.user_id != current_user.get("id")):
         return None
     if link_data.original_url:
         link.original_url = link_data.original_url
@@ -92,7 +92,7 @@ async def update_link(db: AsyncSession, short_code: str, link_data: LinkUpdate, 
 async def delete_link(db: AsyncSession, short_code: str, current_user: dict):
     result = await db.execute(select(Link).filter(Link.short_code == short_code))
     link = result.scalar_one_or_none()
-    if not link or (link.user_id != current_user.get("id")):
+    if not link or (link.user_id and link.user_id != current_user.get("id")):
         return False
     await db.delete(link)
     await db.commit()
@@ -102,6 +102,7 @@ async def delete_link(db: AsyncSession, short_code: str, current_user: dict):
     await cache_delete(f"search:{link.original_url}:{current_user['id'] if current_user else 'anon'}")
 
     return True
+
 
 async def get_link_stats(db: AsyncSession, short_code: str):
     cache_key = f"link_stats:{short_code}"
