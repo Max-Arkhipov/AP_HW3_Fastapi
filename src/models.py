@@ -3,8 +3,8 @@ from datetime import datetime
 from sqlalchemy import Column, String, TIMESTAMP, Boolean, DateTime, Integer, ForeignKey, func
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm import relationship
-
-from src.database import Base
+# from src.database import Base
+from src.base import Base
 
 class User(Base):
     __tablename__ = "users"
