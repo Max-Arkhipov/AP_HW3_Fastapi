@@ -55,11 +55,10 @@ async def get_link(db: AsyncSession, short_code: str):
             link.clicks += 1
             link.last_used = datetime.utcnow()
             await cache_set(cache_key, link.model_dump(by_alias=True, mode="json"))
-            return link
+            return link.original_url
         else:
             await cache_delete(cache_key)
             return None
-
     result = await db.execute(select(Link).filter(Link.short_code == short_code, Link.is_active == True))
     link = result.scalar_one_or_none()
     if link and (not link.expires_at or link.expires_at > datetime.now(timezone.utc)):

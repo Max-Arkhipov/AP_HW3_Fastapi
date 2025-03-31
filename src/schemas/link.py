@@ -21,6 +21,7 @@ class Link(LinkBase):
     created_at: Optional[datetime] = None
     clicks: int
     last_used: Optional[datetime] = None
+    is_active: bool
 
     class Config:
         from_attributes = True
@@ -32,7 +33,7 @@ class LinkSchema(BaseModel):
     created_at: Optional[datetime] = None
     user_id: Optional[int] = None
     expires_at: Optional[datetime] = None
-    clicks: int
+    clicks: int = None
     last_used: Optional[datetime] = None
     project: Optional[str] = None
     is_active: bool

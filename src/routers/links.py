@@ -18,12 +18,12 @@ async def shorten_link(
 ):
     return await create_link(db, link, current_user)
 
-@router.get("/get_link/{short_code}", response_model=Link)
+@router.get("/get_link/{short_code}", response_model=str)
 async def read_link(short_code: str, db: AsyncSession = Depends(get_async_session)):
-    link = await get_link(db, short_code)
-    if link is None:
+    original_url = await get_link(db, short_code)
+    if original_url is None:
         raise HTTPException(status_code=404, detail="Link not found or expired")
-    return link
+    return original_url
 
 @router.put("/put_link/{short_code}", response_model=Link)
 async def update_link_endpoint(
