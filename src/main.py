@@ -9,10 +9,10 @@ from src.database import engine, init_db
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    # Код, выполняемый при старте приложения
+
     await init_db()
     yield
-    # Код, выполняемый при завершении приложения
+
     await engine.dispose()
 
 app = FastAPI(title="Link Shortener API", lifespan=lifespan)
