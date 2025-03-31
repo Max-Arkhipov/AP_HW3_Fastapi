@@ -31,6 +31,8 @@ GET /links/project/{project}
 ![Upload%20data.gif](https://github.com/Max-Arkhipov/AP_HW3_Fastapi/blob/main/assets/link_shorten.gif)
 ### Изменение короткой ссылки  
 ![Upload%20data.gif](https://github.com/Max-Arkhipov/AP_HW3_Fastapi/blob/main/assets/link_put.gif)
+### Просмотр статистики по короткой ссылки
+![Upload%20data.gif](https://github.com/Max-Arkhipov/AP_HW3_Fastapi/blob/main/assets/link_stats.gif)
 ### Удаление короткой ссылки
 ![Upload%20data.gif](https://github.com/Max-Arkhipov/AP_HW3_Fastapi/blob/main/assets/link_delete.gif)
 ### Получение оригинального URL  
