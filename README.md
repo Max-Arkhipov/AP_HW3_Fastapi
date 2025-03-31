@@ -1,7 +1,7 @@
 # Демонстрация работы сервиса
 
-### Загрузка и просмотр основных характеристик
-![Upload data.gif](assets/Upload%20data.gif)
+### Регистрация пользователя
+![Upload%20data.gif](https://github.com/Max-Arkhipov/AP_HW3_Fastapi/blob/main/assets/link_expired.gif)
 ### Предобработка данных
 ![send data.gif](assets/send%20data.gif)
 ### Обучение модели
