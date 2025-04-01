@@ -24,3 +24,4 @@ locust
 httpx
 pytest-mock
 aiosqlite
+python-jose
